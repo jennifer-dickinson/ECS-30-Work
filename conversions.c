@@ -13,6 +13,15 @@
 #include <string.h>
 #include <ctype.h>
 
+void assert_formatting(int numberOfArguments, int argumentsNeeded ) {
+    char newLine;
+    scanf("%c", &newLine);
+    if (numberOfArguments != argumentsNeeded || newLine != '\n') {
+        printf("Invalid formatting. Ending program");
+        exit(0);
+        }
+}
+
 double convertTemperature(char unit, char newUnit, double number) {
     // Convert a given temperature to another (fahrenheit, celsius, and Kelvin)
     if ( unit == newUnit) {
@@ -49,16 +58,10 @@ double convertTemperature(char unit, char newUnit, double number) {
     return  9999.99;
 }
 
-void checkTemperatureUnit (char unit[20]) {
+void checkTemperatureUnit (char unit) {
     // Check to see if the user inputed a valid temperature unit of Kelvin, celsius or fahrenheit
-    unit[0] = toupper(unit[0]);
-    if (strlen(unit) != 1) {
-        printf("Invalid formatting. Ending program.\n");
-        exit(0);
-    }
-    
-    else if(! (unit[0] == 'K' || unit[0] == 'C' || unit[0] == 'F') ) {
-        printf("%s is not a valid temperature type. Ending program.\n", unit);
+    if(! (unit == 'K' || unit == 'C' || unit == 'F') ) {
+        printf("%c is not a valid temperature type. Ending program.\n", unit);
         exit(0);
     }
 }
@@ -66,19 +69,22 @@ void checkTemperatureUnit (char unit[20]) {
 void temperatureConversionPrompt () {
     // Prompt user for the temperature and initial unit and the unit to convert it to.
     double number;
-    char unit[20], newUnit[20];
+    char unit, newUnit;
+    int numberOfArguments = 0;
     
     printf("Enter the temperature followed by its suffix (F, C, or K): ");
-    scanf(" %lf %s", &number, unit);
+    numberOfArguments = scanf(" %lf %c", &number, &unit);
+    assert_formatting(numberOfArguments, 2);
+    unit = toupper(unit);
     checkTemperatureUnit(unit);
-    unit[0] = toupper(unit[0]);
     
     printf("Enter the new unit type (F, C, or K): ");
-    scanf(" %s", newUnit);
+    numberOfArguments = scanf(" %c", &newUnit);
+    assert_formatting(numberOfArguments, 1);
+    newUnit = toupper(newUnit);
     checkTemperatureUnit(newUnit);
-    newUnit[0] = toupper(newUnit[0]);
     
-    printf("%.2lf%s is %.2lf%s\n", number, unit, convertTemperature(unit[0], newUnit[0], number), newUnit);
+    printf("%.2lf%c is %.2lf%c\n", number, unit, convertTemperature(unit, newUnit, number), newUnit);
     
 }
 
@@ -136,15 +142,10 @@ double convertDistance ( char unit, char newUnit, double number) {
     return 9999.99;
 }
 
-void checkDistanceUnit ( char unit[20]) {
+void checkDistanceUnit ( char unit) {
     // Check to make user inputted a valid distance unit of inches, feet, yards or meters
-    unit[0] = toupper(unit[0]);
-    if (strlen(unit) != 1 ) {
-        printf("Invalid formatting. Ending program.\n");
-        exit(0);
-    }
-    else if(! (unit[0] == 'I' || unit[0] == 'F' || unit[0] == 'Y' || unit[0] == 'M') ) {
-        printf("%s is not a valid distance type. Ending program.\n", unit);
+    if(! (unit == 'I' || unit== 'F' || unit == 'Y' || unit == 'M') ) {
+        printf("%c is not a valid distance type. Ending program.\n", unit);
         exit(0);
     }
 }
@@ -152,31 +153,27 @@ void checkDistanceUnit ( char unit[20]) {
 void distanceConversionPrompt () {
     // Prompt user for the distance and initial unit and the unit to convert it to.
     double number;
-    char unit[20], newUnit[20];
+    char unit, newUnit;
+    int numberOfArguments;
     
     printf("Enter the distance followed by its suffix (I,F,Y,M): ");
-    scanf(" %lf %s", &number, unit);
+    numberOfArguments = scanf(" %lf %c", &number, &unit);
+    assert_formatting(numberOfArguments, 2);
+    unit = toupper(unit);
     checkDistanceUnit(unit);
-    unit[0] = toupper(unit[0]);
     
     printf("Enter the new unit type (I,F,Y,M): ");
-    scanf(" %s", newUnit);
+    numberOfArguments = scanf(" %c", &newUnit);
+    assert_formatting(numberOfArguments, 1);
+    newUnit = toupper(newUnit);
     checkDistanceUnit(newUnit);
-    newUnit[0] = toupper(newUnit[0]);
     
-    printf("%.2lf%s is %.2lf%s\n", number, unit, convertDistance(unit[0], newUnit[0], number), newUnit);
-    
+    printf("%.2lf%c is %.2lf%c\n", number, unit, convertDistance(unit, newUnit, number), newUnit);
 }
 
-
-void conversion(char choice[50]) {
-    // Check for valid user input
-    if (strlen(choice) > 1) {
-        printf("Invalid formatting. Ending program.\n");
-        exit(0);
-    }
+void conversion(char choice) {
     // Prompt the user for more information based on choice
-    switch (choice[0]) {
+    switch (choice) {
             case 'T':
             case 't':
             temperatureConversionPrompt();
@@ -186,21 +183,23 @@ void conversion(char choice[50]) {
             distanceConversionPrompt();
             break;
         default:
-            printf("Unknown conversion type %c chosen. Ending Program.\n", choice[0]);
+            printf("Unknown conversion type %c chosen. Ending Program.\n", choice);
             exit(0);
     }
 }
 
-
 int main () {
-    char choice[50] = "";
+    char choice = ' ';
+    int numberOfArguments = 0;
     
     printf("Pick the type of conversion that you would like to do.\n");
     printf("T or t for temperature\n");
     printf("D or d for distance\n");
     printf("Enter your choice: ");
-    scanf(" %s", choice);
-
+    numberOfArguments = scanf(" %c", &choice);
+    
+    assert_formatting(numberOfArguments, 1);
+    
     conversion(choice);
     
     return 0;

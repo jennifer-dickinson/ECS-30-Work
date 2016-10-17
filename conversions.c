@@ -10,11 +10,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <ctype.h>
 
 void assert_formatting(int numberOfArguments, int argumentsNeeded ) {
-    char newLine;
+    char newLine = ' ';
     scanf("%c", &newLine);
     if (numberOfArguments != argumentsNeeded || newLine != '\n') {
         printf("Invalid formatting. Ending program");
@@ -34,6 +33,8 @@ double convertTemperature(char unit, char newUnit, double number) {
                 return (number - 32) * 5/9;
             case 'K':
                 return (number - 32) * 5/9 + 273.15;
+            default:
+                break;
         }
     }
     else if (unit == 'C') {
@@ -43,6 +44,8 @@ double convertTemperature(char unit, char newUnit, double number) {
                 return (number * 9/5) + 32;
             case 'K':
                 return number + 273.15;
+            default:
+                break;
         }
     }
     else if (unit == 'K') {
@@ -52,6 +55,8 @@ double convertTemperature(char unit, char newUnit, double number) {
                 return (number - 273.15);
             case 'F':
                 return (number - 273.15) * 9/5 + 32;
+            default:
+                break;
         }
     }
     // Should never get to this point because of input validation
@@ -68,8 +73,8 @@ void checkTemperatureUnit (char unit) {
 
 void temperatureConversionPrompt () {
     // Prompt user for the temperature and initial unit and the unit to convert it to.
-    double number;
-    char unit, newUnit;
+    double number = 0.0;
+    char unit = ' ', newUnit = ' ';
     int numberOfArguments = 0;
     
     printf("Enter the temperature followed by its suffix (F, C, or K): ");
@@ -102,6 +107,8 @@ double convertDistance ( char unit, char newUnit, double number) {
                 return number / 36.0;
             case 'M':
                 return number / 63360.0;
+            default:
+                break;
                 
         }
     }
@@ -114,6 +121,8 @@ double convertDistance ( char unit, char newUnit, double number) {
                 return number / 3.0;
             case 'M':
                 return number / 5280.0;
+            default:
+                break;
         }
     }
     else if (unit == 'Y') {
@@ -125,6 +134,8 @@ double convertDistance ( char unit, char newUnit, double number) {
                 return number * 3.0;
             case 'M':
                 return number  / 1760.0;
+            default:
+                break;
         }
     }
     else if ( unit == 'M') {
@@ -136,6 +147,8 @@ double convertDistance ( char unit, char newUnit, double number) {
                 return number * 5280.0;
             case 'Y':
                 return number * 1760.0;
+            default:
+                break;
         }
     }
     // Should never get to this point because of input validation
@@ -152,9 +165,9 @@ void checkDistanceUnit ( char unit) {
 
 void distanceConversionPrompt () {
     // Prompt user for the distance and initial unit and the unit to convert it to.
-    double number;
-    char unit, newUnit;
-    int numberOfArguments;
+    double number = 0.0;
+    char unit = ' ', newUnit = ' ';
+    int numberOfArguments = 0;
     
     printf("Enter the distance followed by its suffix (I,F,Y,M): ");
     numberOfArguments = scanf(" %lf %c", &number, &unit);
@@ -196,8 +209,8 @@ int main () {
     printf("T or t for temperature\n");
     printf("D or d for distance\n");
     printf("Enter your choice: ");
-    numberOfArguments = scanf(" %c", &choice);
     
+    numberOfArguments = scanf(" %c", &choice);
     assert_formatting(numberOfArguments, 1);
     
     conversion(choice);

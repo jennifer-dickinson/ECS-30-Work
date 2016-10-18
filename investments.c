@@ -2,7 +2,7 @@
 //  investments.c
 //  ECS 30 Work
 //
-//  This program will calculate whether it is better to make full payments on a loan or minimum payments on a loan with the remaining going to an investment account.
+//  This program will calculate whether it is better to make full or minimum payments on a loan with the remaining going to an investment account. investments.c makes use of do while loops and pointers as an exercise. A modified and more compact version of assert_formatting has been implemented.
 //
 //  Created by Jennifer Salas on 10/16/16.
 //  Copyright © 2016 Jennifer Salas. All rights reserved.
@@ -13,22 +13,20 @@
 #include <stdbool.h>
 #include <string.h>
 
-void UserPrompt();
+void UserPrompt(), singeInputValidation(), loanAndSavingsCalc();
+
 
 bool assert_formatting (int numberOfArguments, int numNeeded) {
     // Checks if user input is formatted correctly.
-    char garbage[1];
-    scanf("%[^\n]", garbage);
-    if (numberOfArguments == numNeeded && strlen(garbage) == 0) {
-        return true;
-    }
-    return false;
+    char garbage[512]; // Picked a random size... will try to figure out a better implementation.
+    scanf("%511[^\n]%*c", garbage);
+    return (numberOfArguments == numNeeded && strlen(garbage) == 0);
 }
 
 // For use in SingleNumValid to check input
 enum dataType {DOUBLE, INTEGER};
 
-void SingleInputValidation (char string[80], enum dataType type, void* value) {
+void SingleInputValidation (char string[], enum dataType type, void* value) {
     // This function will print a message and request input until a valid input is entered and then return the value to a variable
     int numberOfArguments = 0;
     bool greaterThanZero = false;
@@ -43,15 +41,17 @@ void SingleInputValidation (char string[80], enum dataType type, void* value) {
             numberOfArguments = scanf(" %lf", &*(double*)value);
             greaterThanZero = *(double*)value > 0.0;
         }
-        
-    } while ( !assert_formatting(numberOfArguments, 1) || !greaterThanZero);
-    void free(void* value);
+    } while (!(assert_formatting(numberOfArguments, 1) && greaterThanZero));
+    
+
 }
 
 void loanAndSavingsCalc( double loanPrin, double MPR, double moPay, double loanPay, double MRR, int mosToRetire, double* finSavBal, double* finLoanBal) {
-    // loanAndSavingsCalc will calculate the total accured savings and final loan amount after a given period of time based on the payment applied to each.
+    // loanAndSavingsCalc() will calculate the total accured savings and final loan amount after a given period of time based on the payment applied to each.
     double interest = 0.0, investmentPayment = moPay - loanPay, loanBal = loanPrin, savBal = 0, savInt = 0.0;
+    
     while (mosToRetire > 0) {
+        // Calculate loan balance
         interest = loanBal * MPR;
         loanBal += interest;
         
@@ -68,6 +68,7 @@ void loanAndSavingsCalc( double loanPrin, double MPR, double moPay, double loanP
             investmentPayment = moPay;
         }
         
+        // Calculate accured return
         savInt = savBal * MRR;
         savBal += investmentPayment + savInt;
         --mosToRetire;
@@ -80,8 +81,7 @@ void UserPrompt() {
     double moPay, loanPrin, APR, minMoPay, ARR, MPR, MRR,  minPaySavBal, minPayLoanBal, maxPaySavBal, maxPayLoanBal;
     int age = 0, retAge = 0, mosToRetire = 0;
     
-    SingleInputValidation("Enter how much money you will be putting towards loans/retirement each \
-                          month: ",
+    SingleInputValidation("Enter how much money you will be putting towards loans/retirement each month: ",
                           DOUBLE, &moPay);
     
     SingleInputValidation("Enter how much you owe in loans: ",
@@ -125,6 +125,7 @@ void UserPrompt() {
     double savBal = (minPayTrue)? minPaySavBal : maxPaySavBal;
     double lesSavBal = (minPayTrue)? maxPaySavBal: minPaySavBal;
 
+    // Print out the better of the either paying minimum payments to loan or paying the max amount available.
     if ( loanBal > 0 ) {
         printf("Warning! After you retire you will still have $%.2lf in loans left.\n", loanBal);
         }
@@ -140,4 +141,5 @@ void UserPrompt() {
 
 int main () {
     UserPrompt();
+    return 0;
 }

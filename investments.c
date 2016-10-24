@@ -10,49 +10,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <ctype.h>
 
-bool assert_formatting(int numberOfArguments, int numNeeded) {
+int assert_formatting(int numberOfArguments, int numNeeded) {
     // read the entire line if user input and check if it is valid.
     
     char newLine;
-    bool garbage = false;
+    int garbage = 0;
     do {scanf("%c", &newLine);
-        garbage = (newLine != '\n' && !isspace(newLine)) || garbage;
+        garbage = (newLine != '\n' && newLine !=' ') || garbage;
         } while ( newLine != '\n');
     return (numberOfArguments == numNeeded && !garbage);
 }
 
-// For use in SingleInputValidation to check input
-enum dataType {
-    DOUBLE, INTEGER
-};
-
-void SingleInputValidation(char string[], enum dataType type, void *value) {
-    // SingleInputValidation will print a message and request input until a valid input is entered and then return the value to a variable
-    int numberOfArguments = 0;
-    bool greaterThanZero = false;
-
-    do {
-        printf("%s", string);
-        if (type == INTEGER) {
-            numberOfArguments = scanf(" %d", &*(int *) value);
-            greaterThanZero = *(int *) value > 0;
-        }
-        else {
-            numberOfArguments = scanf(" %lf", &*(double *) value);
-            greaterThanZero = *(double *) value > 0.0;
-        }
-    } while (!(assert_formatting(numberOfArguments, 1) && greaterThanZero));
-
-
-}
-
 void LoanAndSavingsCalc(double loanPrin, double MPR, double moPay, double loanPay, double MRR, int mosToRetire, double *finSavBal, double *finLoanBal) {
     // loanAndSavingsCalc() will calculate the total accured savings and final loan amount after a given period of time based on the payment applied to each.
-    double interest, investmentPayment = moPay - loanPay, loanBal = loanPrin, savBal, savInt;
+    double interest, investmentPayment = moPay - loanPay, loanBal = loanPrin, savBal = 0, savInt;
 
     while (mosToRetire > 0) {
         // Calculate loan balance
@@ -83,20 +55,25 @@ void LoanAndSavingsCalc(double loanPrin, double MPR, double moPay, double loanPa
 
 void UserPrompt() {
     double moPay, loanPrin, APR, minMoPay, ARR, MPR, MRR, minPaySavBal, minPayLoanBal, maxPaySavBal, maxPayLoanBal;
-    int age, retAge, mosToRetire;
+    int age, retAge, mosToRetire, numArgs;
 
-    SingleInputValidation("Enter how much money you will be putting towards loans/retirement each month: ",
-                          DOUBLE, &moPay);
 
-    SingleInputValidation("Enter how much you owe in loans: ",
-                          DOUBLE, &loanPrin);
+    do { printf("Enter how much money you will be putting towards loans/retirement each month: ");
+        numArgs = scanf(" %lf", &moPay);
+    } while ( !assert_formatting(numArgs, 1) || moPay < 0);
 
-    SingleInputValidation("Enter the annual interest rate of the loans: ",
-                          DOUBLE, &APR);
+    do{ printf("Enter how much you owe in loans: ");
+        numArgs = scanf(" %lf", & loanPrin);
+    } while (!assert_formatting(numArgs, 1) || loanPrin < 0);
+
+    do{ printf("Enter the annual interest rate of the loans: ");
+        numArgs = scanf(" %lf", &APR);
+    } while (!assert_formatting(numArgs, 1) || APR < 0);
     MPR = APR / 12.0;
 
-    SingleInputValidation("Enter your minimum monthly loan payment: ",
-                          DOUBLE, &minMoPay);
+    do{ printf("Enter your minimum monthly loan payment: ");
+        numArgs = scanf(" %lf", &minMoPay);
+    } while (!assert_formatting(numArgs, 1) || minMoPay < 0);
 
     // First check if enough money is set aside to pay minimum
     if (minMoPay > moPay) {
@@ -104,17 +81,19 @@ void UserPrompt() {
         exit(0);
     }
 
-    SingleInputValidation("Enter your current age: ", INTEGER, &age);
+    do{ printf("Enter your current age: ");
+        numArgs = scanf(" %d", &age);
+    } while (!assert_formatting(numArgs, 1) || age < 0);
 
-    // Couldn't avoid making a do while loop here.
-    do {
-        SingleInputValidation("Enter the age you plan to retire at: ",
-                              INTEGER, &retAge);
-    } while (retAge <= age);
+    do{ printf("Enter the age you plan to retire at: ");
+        numArgs = scanf(" %d", &retAge);
+        
+    } while ( !assert_formatting(numArgs, 1) || retAge <= age);
     mosToRetire = (retAge - age) * 12;
 
-    SingleInputValidation("Enter the annual rate of return you predict for your investments: ",
-                          DOUBLE, &ARR);
+    do{ printf("Enter the annual rate of return you predict for your investments: ");
+        numArgs = scanf(" %lf", &ARR);
+    } while (!assert_formatting(numArgs, 1) || ARR < 0);
     MRR = ARR / 12.0;
 
     // Check how much investment will be accrued if the minimum is payed to loan
@@ -124,12 +103,11 @@ void UserPrompt() {
     LoanAndSavingsCalc(loanPrin, MPR, moPay, moPay, MRR, mosToRetire, &maxPaySavBal, &maxPayLoanBal);
 
     // Check which is better;
-    bool minPayTrue = (minPaySavBal > maxPaySavBal &&
+    int minPayTrue = (minPaySavBal > maxPaySavBal &&
                        (minPaySavBal != maxPaySavBal || !(minPayLoanBal > maxPayLoanBal)));
     double loanBal = (minPayTrue) ? minPayLoanBal : maxPayLoanBal;
 
     // Print out the better of the either paying minimum payments to loan or paying the max amount available.
-    printf("Min loan balance: $%.2lf and Max loan bal: $%.21lf\n", minPayLoanBal, maxPayLoanBal);
     if (loanBal > 0) {
         printf("Warning! After you retire you will still have $%.2lf in loans left.\n", loanBal);
     }

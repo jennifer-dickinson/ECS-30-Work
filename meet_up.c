@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void UserPrompt(), Move(), RunSimulation();
+void UserPrompt(), RunSimulation();
 
 int assert_formatting(int numberOfArguments, int numNeeded) {
     // Read the entire line if user input and check if it is valid.
@@ -50,24 +50,25 @@ void UserPrompt(int *seed, int *rows, int *columns, int *rounds) {
     return;
 }
 
-void Move(int *self, int other) {
+int Move(int self, int other) {
     // Calculate a new position and update variable self
-    int move = random() % (abs(*self - other) + 1);
-    *self += (*self < other) ? move : -move;
+    if (self == other) return self;
+    int move = rand() % (abs(self - other) + 1);
+    return (self < other)? self + move: self - move;
 }
 
 void RunSimulation(int rows, int columns, int numOfSims) {
     // Generate a random start position for two pieces and have them move a random distance towards each other.
-    int P1_R, P1_C, P2_R, P2_C, P1_R_OLD, P1_C_OLD, P2_R_OLD, P2_C_OLD, totalrounds = 0;
+    int P1_R, P1_C, P2_R, P2_C, P1_R_NEW, P1_C_NEW, P2_R_NEW, P2_C_NEW, totalrounds = 0;
 
     for (int i = 0; i < numOfSims; i++) {
         // Iterate the simulation a total of numOfSims.
         
         // Generate random start positions.
-        P1_R = random() % rows;
-        P1_C = random() % columns;
-        P2_R = random() % rows;
-        P2_C = random() % columns;
+        P1_R = rand() % rows;
+        P1_C = rand() % columns;
+        P2_R = rand() % rows;
+        P2_C = rand() % columns;
 
         if (numOfSims <= 5) {
             printf("\nSimulation %d\n", i);
@@ -77,38 +78,37 @@ void RunSimulation(int rows, int columns, int numOfSims) {
         while (P1_R != P2_R || P1_C != P2_C) {
             // Move the pieces towards each other until they acquire the same space.
 
-            // Piece 1: update position
-            P1_R_OLD = P1_R;
-            P1_C_OLD = P1_C;
-            if (P1_R != P2_R) Move(&P1_R, P2_R);
-            if (P1_C != P2_C) Move(&P1_C, P2_C);
+            // Piece 1: calculate new position
+            P1_R_NEW = Move(P1_R, P2_R);
+            P1_C_NEW = Move(P1_C, P2_C);
 
-            // Piece 2: update position
-            P2_R_OLD = P2_R;
-            P2_C_OLD = P2_C;
-            if (P2_R != P1_R) Move(&P2_R, P1_R);
-            if (P2_C != P1_C) Move(&P2_C, P1_C);
-
+            // Piece 2: calculate new position
+            P2_R_NEW = Move(P2_R, P1_R);
+            P2_C_NEW = Move(P2_C, P1_C);
+            
+            // Display movement info
             if (numOfSims <= 5) {
-                printf("First piece moves from %d,%d to %d,%d\n", P1_R_OLD, P1_C_OLD, P1_R, P1_C);
-                printf("Second piece moves from %d,%d to %d,%d\n", P2_R_OLD, P2_C_OLD, P2_R, P2_C);
+                printf("First piece moves from %d,%d to %d,%d\n", P1_R, P1_C, P1_R_NEW, P1_C_NEW);
+                printf("Second piece moves from %d,%d to %d,%d\n", P2_R, P2_C, P2_R_NEW, P2_C_NEW);
             }
+            
+            // Update positions
+            P1_R = P1_R_NEW; P1_C = P1_C_NEW;
+            P2_R = P2_R_NEW; P2_C = P2_C_NEW;
 
+            
             totalrounds++;
         }
     }
 
     printf("\nOn average it takes %.2lf rounds on a board %d X %d for the pieces to meet.\n",
-           ((float) totalrounds / (float) numOfSims), rows, columns);
+           ((double) totalrounds / (double) numOfSims), rows, columns);
 }
 
 int main() {
     int seed, rows, columns, rounds;
-
     UserPrompt(&seed, &rows, &columns, &rounds);
-
-    srandom(seed);
-
+    srand(seed);
     RunSimulation(rows, columns, rounds);
 
 

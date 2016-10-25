@@ -22,7 +22,7 @@ int assert_formatting(int numberOfArguments, int numNeeded) {
     return (numberOfArguments == numNeeded && !garbage);
 }
 
-float RandomNumber() {
+double RandomNumber() {
     // Generate  random number in [-1, 1].
     const double LO = -1.0;
     const double HI = 1.0;
@@ -46,7 +46,7 @@ void UserPrompt (int *seed, int *iterations) {
 
 void CalculatePi (int seed, int iterations) {
     // Use the  Monte Carlo method to estimate pi.
-    float x,y, length;
+    double x,y, length;
     int inCircle = 0;
     for ( int i = 0; i < iterations; i++) {
         x = RandomNumber();
@@ -58,8 +58,8 @@ void CalculatePi (int seed, int iterations) {
         }
     }
     
-    float probability = (float)inCircle / (float)iterations;
-    float pi = probability * 4;
+    double probability = (double)inCircle / (double)iterations;
+    double pi = probability * 4;
     printf("The value of pi is %.5lf.\n", pi);
 }
 

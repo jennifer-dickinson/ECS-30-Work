@@ -98,20 +98,15 @@ void UserPrompt() {
 
     // Check how much investment will be accrued if the minimum is payed to loan
     LoanAndSavingsCalc(loanPrin, MPR, moPay, minMoPay, MRR, mosToRetire, &minPaySavBal, &minPayLoanBal);
+    if (minPayLoanBal > 0)printf("Warning! After you retire you will still have $%.2lf in loans left.\n", minPayLoanBal);
 
     // Check how much investment will be accrued if the max amount of money is payed to laon
     LoanAndSavingsCalc(loanPrin, MPR, moPay, moPay, MRR, mosToRetire, &maxPaySavBal, &maxPayLoanBal);
-
+    if (maxPayLoanBal > 0)printf("Warning! After you retire you will still have $%.2lf in loans left.\n", maxPayLoanBal);
+    
+    
     // Check which is better;
-    int minPayTrue = (minPaySavBal > maxPaySavBal &&
-                       (minPaySavBal != maxPaySavBal || !(minPayLoanBal > maxPayLoanBal)));
-    double loanBal = (minPayTrue) ? minPayLoanBal : maxPayLoanBal;
-
-    // Print out the better of the either paying minimum payments to loan or paying the max amount available.
-    if (loanBal > 0) {
-        printf("Warning! After you retire you will still have $%.2lf in loans left.\n", loanBal);
-    }
-    if (minPayTrue) {
+    if (minPaySavBal > maxPaySavBal) {
         printf("You should only make the minimum payments on your loan and apply the rest towards retirement.\n");
 
         printf("If you do you will have $%.2lf when you retire as opposed to $%.2lf if you payed off your loan before investing.\n",

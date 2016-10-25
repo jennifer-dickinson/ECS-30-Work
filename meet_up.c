@@ -11,8 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void UserPrompt(), RunSimulation();
-
 int assert_formatting(int numberOfArguments, int numNeeded) {
     // Read the entire line if user input and check if it is valid.
     char newLine;

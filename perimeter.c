@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <math.h>
 
-void read_lines(FILE *fp, char ***lines, int *num_lines);
 FILE* validate_input(int argc, char* argv[]);
 int **get_points (FILE* fp, int *num_points);
 double calculate_perimiter(int **points, int num_points);
